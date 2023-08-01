@@ -8,12 +8,14 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc",
+    "watch": "tsc -w",
     "dev": "ts-node src/index.ts",
     "lint": "eslint src",
     "prettier": "prettier --write src/**/*.ts",
-    "test": "ts-node test/index.ts"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@types/node": "^20.4.5",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",
