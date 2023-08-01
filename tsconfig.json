@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "outDir": "build/module",
     "module": "CommonJS",
-    "types": ["node"],
-    "lib": ["ESNext"],
-    "moduleResolution": "node"
+    "rootDir": "src",
+    "outDir": "build/module",
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "exclude": ["node_modules/**", "build/**", "**/*.spec.ts"]
 }
