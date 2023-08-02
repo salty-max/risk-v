@@ -12,7 +12,8 @@
     "dev": "ts-node src/index.ts",
     "lint": "rome check src",
     "fmt": "rome format --write src",
-    "test": "echo \"Warn: no test specified\""
+    "test": "echo \"Warn: no test specified\"",
+    "precommit": "yarn fmt && yarn lint"
   },
   "devDependencies": {
     "@types/node": "^20.4.5",

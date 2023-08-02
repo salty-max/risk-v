@@ -1,4 +1,4 @@
-import { MMIODevice } from ".";
+import { MMIODevice } from '.';
 
 export const RAMSize = 0x400 * 0x400 * 4; // 4MB
 

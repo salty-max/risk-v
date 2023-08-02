@@ -1,4 +1,4 @@
-import { MMIODevice } from ".";
+import { MMIODevice } from '.';
 
 export const ROMSize = 0x400 * 0x400; // 1MB
 

@@ -1,6 +1,6 @@
-import { toHexString } from "../util";
-import RAMDevice from "./ram";
-import ROMDevice from "./rom";
+import { toHexString } from '../util';
+import RAMDevice from './ram';
+import ROMDevice from './rom';
 
 export interface MMIODevice {
   read: (address: number) => number;

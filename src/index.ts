@@ -1,7 +1,7 @@
-import SystemInterface from "./system-interface";
-import RAMDevice from "./system-interface/ram";
-import ROMDevice from "./system-interface/rom";
-import { toHexString } from "./util";
+import SystemInterface from './system-interface';
+import RAMDevice from './system-interface/ram';
+import ROMDevice from './system-interface/rom';
+import { toHexString } from './util';
 
 class RVI32System {
   rom = new ROMDevice();
