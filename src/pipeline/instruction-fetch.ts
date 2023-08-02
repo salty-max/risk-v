@@ -23,7 +23,7 @@ export default class InstructionFetch extends PipelineStage {
   }
 
   getInstructionOut() {
-    return this._instruction;
+    return this._instruction.value;
   }
 
   readyToSend(): boolean {
