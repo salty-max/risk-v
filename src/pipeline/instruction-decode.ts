@@ -1,11 +1,25 @@
+import Register32 from '../register32';
 import PipelineStage from './pipeline-stage';
 
-export interface InstructionDecodeParams {
+export type DecodedValues = {
+  instruction: number;
+  opcode: number;
+  rd: number;
+  funct3: number;
+  rs1: number;
+  rs2: number;
+  imm11_0: number;
+  funct7: number;
+  shamt: number;
+};
+
+export interface DecodeParams {
+  regFile: Array<Register32>;
   getInstructionIn(): number;
   shouldStall(): boolean;
 }
 
-export default class InstructionDecode extends PipelineStage {
+export default class Decode extends PipelineStage {
   private _instruction = 0;
   private _instructionNext = 0;
 
@@ -33,11 +47,14 @@ export default class InstructionDecode extends PipelineStage {
   private _shamt = 0;
   private _shamtNext = 0;
 
-  private _getInstructionIn: InstructionDecodeParams['getInstructionIn'];
-  private _shouldStall: InstructionDecodeParams['shouldStall'];
+  private _regFile: DecodeParams['regFile'];
 
-  constructor(params: InstructionDecodeParams) {
+  private _getInstructionIn: DecodeParams['getInstructionIn'];
+  private _shouldStall: DecodeParams['shouldStall'];
+
+  constructor(params: DecodeParams) {
     super();
+    this._regFile = params.regFile;
     this._getInstructionIn = params.getInstructionIn;
     this._shouldStall = params.shouldStall;
   }
@@ -56,15 +73,19 @@ export default class InstructionDecode extends PipelineStage {
 
   compute(): void {
     if (!this._shouldStall) {
+      const rs1Address = (this._instructionNext >> 15) & 0x1f;
+      const rs2Address = (this._instructionNext >> 20) & 0x1f;
+
       this._instructionNext = this._getInstructionIn();
       this._opcodeNext = this._instructionNext & 0x7f;
       this._rdNext = (this._instructionNext >> 7) & 0x1f;
       this._funct3Next = (this._instructionNext >> 12) & 0x7;
-      this._rs1Next = (this._instructionNext >> 15) & 0x1f;
-      this._rs2Next = (this._instructionNext >> 20) & 0x1f;
-      this._imm11_0Next = (this._instructionNext >>> 20) & 0x1f;
+      this._imm11_0Next = (this._instructionNext >>> 20) & 0x7ff;
       this._funct7Next = (this._instructionNext >>> 25) & 0x7f;
-      this._shamtNext = this._rs2Next
+      this._shamtNext = rs2Address;
+
+      this._rs1Next = rs1Address === 0 ? 0 : this._regFile[rs1Address].value;
+      this._rs2Next = rs2Address === 0 ? 0 : this._regFile[rs2Address].value;
     }
   }
 
@@ -80,7 +101,7 @@ export default class InstructionDecode extends PipelineStage {
     this._shamt = this._shamtNext;
   }
 
-  getDecoding() {
+  getDecodedOut(): DecodedValues {
     return {
       instruction: this._instruction,
       opcode: this._opcode,
@@ -91,6 +112,6 @@ export default class InstructionDecode extends PipelineStage {
       imm11_0: this._imm11_0,
       funct7: this._funct7,
       shamt: this._shamt,
-    }
+    };
   }
 }
