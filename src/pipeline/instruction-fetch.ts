@@ -9,9 +9,7 @@ export interface InstructionFetchParams {
 
 export default class InstructionFetch extends PipelineStage {
   private _pc = new Register32(MemoryMap.ProgramROMStart);
-  private _pcNext = new Register32(MemoryMap.ProgramROMStart);
   private _instruction = new Register32(0);
-  private _instructionNext = new Register32(0);
 
   private _bus: InstructionFetchParams['bus'];
   private _shouldStall: InstructionFetchParams['shouldStall'];
@@ -35,14 +33,14 @@ export default class InstructionFetch extends PipelineStage {
   }
 
   compute(): void {
-    if (!this._shouldStall) {
-      this._instructionNext.value = this._bus.read(this._pc.value);
-      this._pcNext.value += 4;
+    if (!this._shouldStall()) {
+      this._instruction.value = this._bus.read(this._pc.value);
+      this._pc.value += 4;
     }
   }
 
   latchNext(): void {
-    this._instruction.value = this._instructionNext.value;
-    this._pc.value = this._pcNext.value;
+    this._instruction.latchNext()
+    this._pc.latchNext();
   }
 }
