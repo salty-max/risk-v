@@ -8,32 +8,15 @@ export interface DecodeParams {
 }
 
 export default class Decode extends PipelineStage {
-  private _instruction = 0;
-  private _instructionNext = 0;
-
-  private _opcode = 0;
-  private _opcodeNext = 0;
-
-  private _rd = 0;
-  private _rdNext = 0;
-
-  private _funct3 = 0;
-  private _funct3Next = 0;
-
-  private _rs1 = 0;
-  private _rs1Next = 0;
-
-  private _rs2 = 0;
-  private _rs2Next = 0;
-
-  private _imm11_0 = 0;
-  private _imm11_0Next = 0;
-
-  private _funct7 = 0;
-  private _funct7Next = 0;
-
-  private _shamt = 0;
-  private _shamtNext = 0;
+  private _instruction = new Register32(0);
+  private _opcode = new Register32(0);
+  private _rd = new Register32(0);
+  private _funct3 = new Register32(0);
+  private _rs1 = new Register32(0); 
+  private _rs2 = new Register32(0);
+  private _imm11_0 = new Register32(0);
+  private _funct7 = new Register32(0);
+  private _shamt = new Register32(0);
 
   private _regFile: DecodeParams['regFile'];
 
@@ -61,45 +44,45 @@ export default class Decode extends PipelineStage {
 
   compute(): void {
     if (!this._shouldStall()) {
-      this._instructionNext = this._getInstructionIn();
-      this._opcodeNext = this._instructionNext & 0x7f;
-      this._rdNext = (this._instructionNext >> 7) & 0x1f;
-      this._funct3Next = (this._instructionNext >> 12) & 0x07;
-      this._imm11_0Next = (this._instructionNext >>> 20) & 0xfff;
-      this._funct7Next = (this._instructionNext >>> 25) & 0x7f;
+      this._instruction.value = this._getInstructionIn();
+      this._opcode.value = this._instruction.nextValue & 0x7f;
+      this._rd.value = (this._instruction.nextValue >> 7) & 0x1f;
+      this._funct3.value = (this._instruction.nextValue >> 12) & 0x07;
+      this._imm11_0.value = (this._instruction.nextValue >>> 20) & 0xfff;
+      this._funct7.value = (this._instruction.nextValue >>> 25) & 0x7f;
 
-      const rs1Address = (this._instructionNext >> 15) & 0x1f;
-      const rs2Address = (this._instructionNext >> 20) & 0x1f;
+      const rs1Address = (this._instruction.nextValue >> 15) & 0x1f;
+      const rs2Address = (this._instruction.nextValue >> 20) & 0x1f;
 
-      this._shamtNext = rs2Address;
-      this._rs1Next = rs1Address === 0 ? 0 : this._regFile[rs1Address].value;
-      this._rs2Next = rs2Address === 0 ? 0 : this._regFile[rs2Address].value;
+      this._shamt.value = rs2Address;
+      this._rs1.value = rs1Address === 0 ? 0 : this._regFile[rs1Address].value;
+      this._rs2.value = rs2Address === 0 ? 0 : this._regFile[rs2Address].value;
     }
   }
 
   latchNext(): void {
-    this._instruction = this._instructionNext;
-    this._opcode = this._opcodeNext;
-    this._rd = this._rdNext;
-    this._funct3 = this._funct3Next;
-    this._rs1 = this._rs1Next;
-    this._rs2 = this._rs2Next;
-    this._imm11_0 = this._imm11_0Next;
-    this._funct7 = this._funct7Next;
-    this._shamt = this._shamtNext;
+    this._instruction.latchNext()
+    this._opcode.latchNext()
+    this._rd.latchNext()
+    this._funct3.latchNext()
+    this._rs1.latchNext()
+    this._rs2.latchNext()
+    this._imm11_0.latchNext()
+    this._funct7.latchNext()
+    this._shamt.latchNext()
   }
 
   getDecodedOut() {
     return {
-      instruction: this._instruction,
-      opcode: this._opcode,
-      rd: this._rd,
-      funct3: this._funct3,
-      rs1: this._rs1,
-      rs2: this._rs2,
-      imm11_0: this._imm11_0,
-      funct7: this._funct7,
-      shamt: this._shamt,
+      instruction: this._instruction.value,
+      opcode: this._opcode.value,
+      rd: this._rd.value,
+      funct3: this._funct3.value,
+      rs1: this._rs1.value,
+      rs2: this._rs2.value,
+      imm11_0: this._imm11_0.value,
+      funct7: this._funct7.value,
+      shamt: this._shamt.value,
     };
   }
 }

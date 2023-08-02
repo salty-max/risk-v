@@ -18,3 +18,5 @@ export const untwos = (v: number) => {
     return v;
   }
 };
+
+export const boolToInt = (b: boolean) => Number(b);

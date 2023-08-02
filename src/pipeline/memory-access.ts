@@ -1,3 +1,4 @@
+import Register32 from '../register32';
 import Execute from './execute';
 import PipelineStage from './pipeline-stage';
 
@@ -10,14 +11,9 @@ export default class MemoryAccess extends PipelineStage {
   private _getExecValuesIn: MemoryAccessParams['getExecValuesIn'];
   private _shouldStall: MemoryAccessParams['shouldStall'];
 
-  private _aluResult = 0;
-  private _aluResultNext = 0;
-
-  private _rd = 0;
-  private _rdNext = 0;
-
-  private _isALUOp = false;
-  private _isALUOpNext = false;
+  private _aluResult = new Register32(0);
+  private _rd = new Register32(0);
+  private _isALUOp = new Register32(0);
 
   constructor(params: MemoryAccessParams) {
     super();
@@ -36,23 +32,23 @@ export default class MemoryAccess extends PipelineStage {
   compute(): void {
     if (!this._shouldStall()) {
       const { aluResult, rd, isALUOp } = this._getExecValuesIn();
-      this._aluResultNext = aluResult;
-      this._rdNext = rd;
-      this._isALUOpNext = isALUOp;
+      this._aluResult.value = aluResult;
+      this._rd.value = rd;
+      this._isALUOp.value = isALUOp;
     }
   }
 
   latchNext(): void {
-    this._aluResult = this._aluResultNext;
-    this._rd = this._rdNext;
-    this._isALUOp = this._isALUOpNext;
+    this._aluResult.latchNext()
+    this._rd.latchNext()
+    this._isALUOp.latchNext()
   }
 
   getMAValuesOut() {
     return {
-      aluResult: this._aluResult,
-      rd: this._rd,
-      isALUOp: this._isALUOp,
+      aluResult: this._aluResult.value,
+      rd: this._rd.value,
+      isALUOp: this._isALUOp.value,
     };
   }
 }
